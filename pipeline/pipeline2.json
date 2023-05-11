@@ -164,43 +164,6 @@
 							]
 						},
 						{
-							"name": "Stored procedure1",
-							"type": "SqlServerStoredProcedure",
-							"dependsOn": [
-								{
-									"activity": "Lookup3",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"storedProcedureName": "[dbo].[water_mark_update]",
-								"storedProcedureParameters": {
-									"water_mark_update": {
-										"value": "",
-										"type": "Datetime"
-									},
-									"water_table_name": {
-										"value": "",
-										"type": "String"
-									}
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "AzureSqlDatabase1",
-								"type": "LinkedServiceReference"
-							}
-						},
-						{
 							"name": "Lookup3",
 							"type": "Lookup",
 							"dependsOn": [
@@ -221,19 +184,21 @@
 							"userProperties": [],
 							"typeProperties": {
 								"source": {
-									"type": "DelimitedTextSource",
-									"storeSettings": {
-										"type": "AzureBlobFSReadSettings",
-										"recursive": true,
-										"enablePartitionDiscovery": false
-									},
-									"formatSettings": {
-										"type": "DelimitedTextReadSettings"
+									"type": "MySqlSource",
+									"query": {
+										"value": "@concat('select max(date_time) from ' , item())",
+										"type": "Expression"
 									}
 								},
 								"dataset": {
-									"referenceName": "DelimitedText2",
-									"type": "DatasetReference"
+									"referenceName": "MySqlTable1",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_name": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
 								},
 								"firstRowOnly": false
 							}
