@@ -104,7 +104,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat('select water_mark_value from watermark_config where table_name = ',item())",
+										"value": "@concat('select water_mark_value from watermark_config where table_name = ',variables('quate'),item(),variables('quate'))",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -113,7 +113,167 @@
 								"dataset": {
 									"referenceName": "AzureSqlTable2",
 									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Lookup2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Lookup3",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "MySqlSource",
+									"query": {
+										"value": "@concat('select * from ',item(),' where date_time > ',variables('quate'),activity('Lookup2').output.value[0].water_mark_value,variables('quate'))",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "MySqlTable1",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_name": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DelimitedText1",
+									"type": "DatasetReference",
+									"parameters": {
+										"FILE_NAME": {
+											"value": "@concat(item(),formatDateTime(utcnow(),'yyyy-mm-dd'),'.csv')",
+											"type": "Expression"
+										},
+										"FOLDER_NAME": {
+											"value": "@concat(split(item(),'_')[0],'/',item(),'as_on_date=',formatDateTime(utcnow(), 'yyyy-MM-dd'))",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Stored procedure1",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[store_pro2]",
+								"storedProcedureParameters": {
+									"datecol": {
+										"value": {
+											"value": "@activity('Lookup3').output.value[0].max_value",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"table_name1": {
+										"value": {
+											"value": "@item()",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureSqlDatabase1",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Lookup3",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "MySqlSource",
+									"query": {
+										"value": "@concat('select max(date_time) as max_value from ',item())",
+										"type": "Expression"
+									}
+								},
+								"dataset": {
+									"referenceName": "MySqlTable1",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_name": {
+											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								},
+								"firstRowOnly": false
 							}
 						}
 					]
@@ -126,6 +286,10 @@
 			},
 			"tgt_tables": {
 				"type": "Array"
+			},
+			"quate": {
+				"type": "String",
+				"defaultValue": "'"
 			}
 		},
 		"annotations": []
