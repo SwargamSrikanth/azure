@@ -223,14 +223,14 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[dbo].[water_mark_update]",
+								"storedProcedureName": "[dbo].[water_mark_update1]",
 								"storedProcedureParameters": {
-									"water_mark_update": {
+									"water_mark_date": {
 										"value": {
 											"value": "@activity('Lookup3').output.value[0].max_date",
 											"type": "Expression"
 										},
-										"type": "Datetime"
+										"type": "Byte[]"
 									},
 									"water_table_name": {
 										"value": {
