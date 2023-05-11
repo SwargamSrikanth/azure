@@ -189,7 +189,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"FILE_NAME": {
-											"value": "@concat(item(),formatDateTime(utcnow(),'yyyy-mm-dd'),'.csv')",
+											"value": "@concat(item(),'.csv')",
 											"type": "Expression"
 										},
 										"FOLDER_NAME": {
