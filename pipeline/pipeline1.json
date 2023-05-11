@@ -45,7 +45,7 @@
 						"type": "Expression"
 					},
 					"condition": {
-						"value": "@equals(item().pipeline_name , pipeline().parameters.pipeline_name)",
+						"value": "@equals(activity('Lookup1').output.value[0].pipeline_name,'incr_load')",
 						"type": "Expression"
 					}
 				}
@@ -94,24 +94,16 @@
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 2
+								"waitTimeInSeconds": 1
 							}
 						}
 					]
 				}
 			}
 		],
-		"parameters": {
-			"pipeline_name": {
-				"type": "String"
-			}
-		},
 		"variables": {
 			"source_tables": {
-				"type": "Array",
-				"defaultValue": [
-					"@split(activity('Filter1').output.source_tables , ',')"
-				]
+				"type": "Array"
 			}
 		},
 		"annotations": []
