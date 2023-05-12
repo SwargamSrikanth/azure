@@ -48,6 +48,7 @@
 						"value": "@split(activity('Lookup1').output.value[0].source_tables , ',')",
 						"type": "Expression"
 					},
+					"isSequential": true,
 					"activities": [
 						{
 							"name": "Set variable2",
