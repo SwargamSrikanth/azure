@@ -1,0 +1,9 @@
+{
+	"name": "solar_incr_load",
+	"properties": {
+		"folder": {
+			"name": "incr_load"
+		},
+		"annotations": []
+	}
+}
