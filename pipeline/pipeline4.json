@@ -30,11 +30,68 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "table_names",
+					"value": {
+						"value": "@split(activity('Lookup1').output.value[0].source_tables,',')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('table_names')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "file_paths",
+								"value": {
+									"value": "@concat(split(item(),'_')[0] ,item() ,'/as_on_date ',formatDateTime(utcnow(),'yyyy-mm-dd'))",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"variables": {
 			"table_names": {
 				"type": "Array"
+			},
+			"file_paths": {
+				"type": "String"
 			}
 		},
 		"annotations": []
