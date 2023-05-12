@@ -77,9 +77,42 @@
 							"typeProperties": {
 								"variableName": "file_paths",
 								"value": {
-									"value": "@concat(split(item(),'_')[0] , '/',item() ,'/as_on_date ',formatDateTime(utcnow(),'yyyy-mm-dd'))",
+									"value": "@concat(split(item(),'_')[0] , '/',item() ,'/as_on_date=',formatDateTime(utcnow(),'yyyy-mm-dd'))",
 									"type": "Expression"
 								}
+							}
+						},
+						{
+							"name": "Notebook1",
+							"type": "DatabricksNotebook",
+							"dependsOn": [
+								{
+									"activity": "Set variable2",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Users/mounikavaishu_outlook.com#ext#@mounikavaishuoutlook.onmicrosoft.com/sample/incr_load_water_mark",
+								"baseParameters": {
+									"filename": {
+										"value": "@item()",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureDatabricks1",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
